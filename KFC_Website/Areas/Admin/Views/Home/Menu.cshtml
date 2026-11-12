@@ -1,0 +1,39 @@
+﻿@model IEnumerable<KFC_Website.Models.OrderResult>
+@{
+    ViewBag.Title = "Danh sách đơn hàng";
+}
+
+<div class="container" style="margin-top: 30px; margin-bottom: 60px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="color: #e4002b; font-weight: bold; margin: 0;">Tất cả Đơn hàng (Admin)</h2>
+        <a href="@Url.Action("Index", "Home", new { area = "Admin" })" class="btn btn-default">&larr; Về Dashboard Admin</a>
+    </div>
+
+    <table class="table table-bordered table-hover" style="background: #fff;">
+        <thead style="background: #202124; color: #fff;">
+            <tr>
+                <th>Mã đơn</th>
+                <th>Khách hàng</th>
+                <th>Điện thoại</th>
+                <th>Địa chỉ nhận</th>
+                <th>Tổng tiền</th>
+                <th>Thời gian</th>
+                <th>Trạng thái</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td style="font-weight: bold; color: #e4002b;">@item.OrderId</td>
+                    <td>@item.CustomerName</td>
+                    <td>@item.Phone</td>
+                    <td>@item.Address</td>
+                    <td style="font-weight: bold;">@string.Format("{0:N0} đ", item.TotalAmount)</td>
+                    <td>@item.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td><span class="badge" style="background: #f39c12;">@item.Status</span></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

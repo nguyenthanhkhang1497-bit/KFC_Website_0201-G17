@@ -1,0 +1,68 @@
+﻿@model IEnumerable<KFC_Website.Models.OrderResult>
+@{
+    ViewBag.Title = "Bảng điều khiển Admin";
+}
+
+<div class="container" style="margin-top: 30px; margin-bottom: 60px;">
+    <h2 style="color: #e4002b; font-weight: bold; margin-bottom: 25px;">KHU VỰC QUẢN TRỊ (AREA ADMIN)</h2>
+
+    <div class="row" style="margin-bottom: 30px;">
+        <div class="col-md-3">
+            <div style="background: #e4002b; color: #fff; padding: 20px; border-radius: 8px;">
+                <h4 style="margin: 0; font-size: 13px; text-transform: uppercase;">Doanh thu</h4>
+                <p style="font-size: 22px; font-weight: bold; margin: 10px 0 0;">@string.Format("{0:N0} đ", ViewBag.TotalRevenue)</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div style="background: #202124; color: #fff; padding: 20px; border-radius: 8px;">
+                <h4 style="margin: 0; font-size: 13px; text-transform: uppercase;">Tổng số đơn</h4>
+                <p style="font-size: 22px; font-weight: bold; margin: 10px 0 0;">@ViewBag.TotalOrders</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div style="background: #f39c12; color: #fff; padding: 20px; border-radius: 8px;">
+                <h4 style="margin: 0; font-size: 13px; text-transform: uppercase;">Chờ xử lý</h4>
+                <p style="font-size: 22px; font-weight: bold; margin: 10px 0 0;">@ViewBag.PendingOrders</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div style="background: #27ae60; color: #fff; padding: 20px; border-radius: 8px;">
+                <h4 style="margin: 0; font-size: 13px; text-transform: uppercase;">Món thực đơn</h4>
+                <p style="font-size: 22px; font-weight: bold; margin: 10px 0 0;">@ViewBag.TotalMenuItems</p>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-bottom: 25px;">
+        <a href="@Url.Action("Menu", "Home", new { area = "Admin" })" class="btn btn-danger">Quản lý Thực đơn</a>
+        <a href="@Url.Action("Orders", "Home", new { area = "Admin" })" class="btn btn-default" style="margin-left: 10px;">Quản lý Đơn hàng</a>
+        <a href="@Url.Action("Index", "Home", new { area = "" })" class="btn btn-link">&larr; Quay về trang bán hàng</a>
+    </div>
+
+    <h4>Đơn hàng gần đây</h4>
+    <table class="table table-bordered table-hover" style="background: #fff; margin-top: 15px;">
+        <thead style="background: #202124; color: #fff;">
+            <tr>
+                <th>Mã đơn</th>
+                <th>Khách hàng</th>
+                <th>SĐT</th>
+                <th>Tổng tiền</th>
+                <th>Thời gian</th>
+                <th>Trạng thái</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var o in Model)
+            {
+                <tr>
+                    <td style="font-weight: bold; color: #e4002b;">@o.OrderId</td>
+                    <td>@o.CustomerName</td>
+                    <td>@o.Phone</td>
+                    <td style="font-weight: bold;">@string.Format("{0:N0} đ", o.TotalAmount)</td>
+                    <td>@o.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td><span class="badge" style="background: #f39c12;">@o.Status</span></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

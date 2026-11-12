@@ -1,0 +1,106 @@
+﻿@model IEnumerable<KFC_Website.Models.OrderItemViewModel>
+
+@{
+    var order = ViewBag.Order as KFC_Website.Models.OrderResult;
+    ViewBag.Title = "Chi tiết đơn hàng " + (order != null ? order.OrderId : "");
+}
+
+<div class="container" style="margin-top: 30px; margin-bottom: 60px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <a href="@Url.Action("OrderList", "Home")" class="btn btn-default">&larr; Quay lại danh sách đơn</a>
+
+        <!-- Cập nhật trạng thái nhanh -->
+        @if (order != null)
+        {
+            <div style="display: flex; gap: 8px;">
+                <button onclick="changeStatus('@order.OrderId', 'Đang chuẩn bị')" class="btn btn-primary btn-sm">Chuẩn bị món</button>
+                <button onclick="changeStatus('@order.OrderId', 'Đang giao')" class="btn btn-warning btn-sm">Giao hàng</button>
+                <button onclick="changeStatus('@order.OrderId', 'Hoàn tất')" class="btn btn-success btn-sm">Hoàn tất</button>
+                <button onclick="changeStatus('@order.OrderId', 'Đã hủy')" class="btn btn-danger btn-sm">Hủy đơn</button>
+            </div>
+        }
+    </div>
+
+    @if (order != null)
+    {
+        <div class="panel panel-default" style="border-top: 4px solid #e4002b; padding: 20px; background: #fff; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 25px;">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3 style="color: #e4002b; margin-top: 0; font-weight: bold;">Đơn hàng: @order.OrderId</h3>
+                    <p><strong>Người nhận:</strong> @order.CustomerName</p>
+                    <p><strong>Số điện thoại:</strong> @order.Phone</p>
+                    <p><strong>Địa chỉ:</strong> @order.Address</p>
+                </div>
+                <div class="col-md-6" style="text-align: right;">
+                    <p><strong>Ngày đặt:</strong> @order.OrderDate.ToString("dd/MM/yyyy HH:mm:ss")</p>
+                    <p>
+                        <strong>Trạng thái hiện tại:</strong>
+                        <span class="badge" style="background: #e4002b; font-size: 14px; padding: 6px 12px;" id="lblStatus">@order.Status</span>
+                    </p>
+                    <p style="font-size: 18px; margin-top: 10px;">
+                        <strong>Tổng thanh toán:</strong>
+                        <span style="color: #e4002b; font-weight: bold; font-size: 22px;">@string.Format("{0:N0} đ", order.TotalAmount)</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    }
+
+    <h4 style="font-weight: bold; margin-bottom: 15px;">Danh sách món ăn</h4>
+    <table class="table table-bordered table-hover" style="background: #fff;">
+        <thead style="background: #202124; color: #fff;">
+            <tr>
+                <th style="width: 80px; text-align: center;">Ảnh</th>
+                <th>Tên món ăn</th>
+                <th style="width: 120px; text-align: center;">Số lượng</th>
+                <th style="width: 150px; text-align: right;">Đơn giá</th>
+                <th style="width: 180px; text-align: right;">Thành tiền</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td style="text-align: center;">
+                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                        {
+                            <img src="@item.ImageUrl" alt="@item.ItemName" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" />
+                        }
+                        else
+                        {
+                            <span class="text-muted">No img</span>
+                        }
+                    </td>
+                    <td style="vertical-align: middle; font-weight: 600;">@item.ItemName</td>
+                    <td style="vertical-align: middle; text-align: center;">@item.Quantity</td>
+                    <td style="vertical-align: middle; text-align: right;">@string.Format("{0:N0} đ", item.UnitPrice)</td>
+                    <td style="vertical-align: middle; text-align: right; font-weight: bold; color: #e4002b;">
+                        @string.Format("{0:N0} đ", item.Quantity * item.UnitPrice)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<script>
+function changeStatus(orderId, newStatus) {
+    if (!confirm('Bạn có chắc muốn đổi trạng thái sang "' + newStatus + '"?')) return;
+
+    fetch('/Home/UpdateOrderStatus', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'orderId=' + encodeURIComponent(orderId) + '&status=' + encodeURIComponent(newStatus)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.Success) {
+            document.getElementById('lblStatus').innerText = newStatus;
+            alert(data.Message);
+        } else {
+            alert(data.Message);
+        }
+    })
+    .catch(err => alert('Lỗi kết nối!'));
+}
+</script>

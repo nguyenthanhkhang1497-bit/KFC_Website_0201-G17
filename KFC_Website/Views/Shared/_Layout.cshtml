@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark">
+        <div class="container">
+            @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Toggle navigation" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1">
+                    <li>@Html.ActionLink("Trang chủ", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+                    <li>@Html.ActionLink("About", "About", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+                    <li>@Html.ActionLink("Contact", "Contact", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+                    <li>@Html.ActionLink("Đơn hàng của tôi", "OrderList", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+                    <li>@Html.ActionLink("Quản trị (Admin)", "Index", "Home", new { area = "Admin" }, new { @class = "nav-link", style = "color: #ffc107 !important; font-weight: bold;" })</li>
+                </ul>
+                <div class="auth-buttons" style="display: flex; align-items: center; gap: 10px;">
+                    @if (Session["Username"] != null)
+                    {
+                        <span style="color: #fff;">Xin chào, <strong>@(Session["FullName"] ?? Session["Username"])</strong></span>
+                        if (Session["UserRole"] != null && Session["UserRole"].ToString() == "Admin")
+                        {
+                            <span class="badge" style="background: #e4002b;">Admin</span>
+                        }
+                        <a href="@Url.Action("Logout", "Account", new { area = "" })" class="btn btn-sm btn-outline-light">Đăng xuất</a>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-outline-danger" onclick="openModal('loginModal')">Đăng nhập</button>
+                        <button type="button" class="btn btn-danger" onclick="openModal('registerModal')">Đăng ký</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+    <script>
+        function openModal(id) {
+            var modal = document.getElementById(id);
+            if (modal) modal.style.display = 'block';
+        }
+
+        function closeModal(id) {
+            var modal = document.getElementById(id);
+            if (modal) modal.style.display = 'none';
+        }
+
+        function submitLogin() {
+            var u = document.getElementById('loginUser').value.trim();
+            var p = document.getElementById('loginPass').value.trim();
+            if (!u || !p) { alert('Vui lòng điền đủ tài khoản và mật khẩu!'); return; }
+
+            fetch('/Account/Login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'username=' + encodeURIComponent(u) + '&password=' + encodeURIComponent(p)
+            })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.Success) {
+                        alert(res.Message);
+                        if (res.Role === 'Admin') {
+                            window.location.href = '/Admin/Home/Index';
+                        } else {
+                            window.location.reload();
+                        }
+                    } else {
+                        alert(res.Message);
+                    }
+                });
+        }
+    </script>
+</body>
+</html>
